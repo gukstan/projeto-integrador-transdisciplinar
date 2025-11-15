@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Relatório de Vendas</title>
+</head>
+<body>
+    <a href="{% url 'dashboard:index' %}">[Voltar ao Dashboard]</a>
+    <h2>Relatório de Vendas</h2>
+    
+    <form method="GET">
+        <label for="id_from">De:</label>
+        <input type="date" name="date_from" value="{{ date_from }}" id="id_from">
+        <label for="id_to">Até:</label>
+        <input type="date" name="date_to" value="{{ date_to }}" id="id_to">
+        <button type="submit">Filtrar</button>
+    </form>
+    <hr>
+    
+    <h3>Total Vendido (Filtrado): R$ {{ total_vendido }}</h3>
+    
+    <h3>Produtos Mais Vendidos (Top 10)</h3>
+    <ul>
+    {% for item in produtos_mais_vendidos %}
+        <li>{{ item.produto__nome }} ({{ item.total_unidades }} unidades)</li>
+    {% empty %}
+        <li>Nenhum produto vendido no período.</li>
+    {% endfor %}
+    </ul>
+    
+</body>
+</html>

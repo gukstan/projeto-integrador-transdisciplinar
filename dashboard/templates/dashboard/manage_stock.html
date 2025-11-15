@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gerenciar Estoque</title>
+</head>
+<body>
+    <a href="{% url 'dashboard:index' %}">[Voltar ao Dashboard]</a>
+    <h2>Gerenciar Estoque</h2>
+    
+    <table border="1" cellpadding="5">
+        <thead>
+            <tr>
+                <th>Produto</th>
+                <th>Estoque Atual</th>
+                <th>Ação</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for product in products %}
+            <tr>
+                <td>{{ product.nome }}</td>
+                <td>{{ product.quantidade_estoque }}</td>
+                <td><a href="{% url 'dashboard:update_stock' product.pk %}">Editar</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

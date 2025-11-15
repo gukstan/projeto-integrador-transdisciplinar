@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Meus Pedidos</title>
+</head>
+<body>
+    <a href="{% url 'store:product_list' %}">[Voltar para Vitrine]</a>
+    <h2>Meus Pedidos</h2>
+    
+    {% for order in orders %}
+        <div>
+            <h3><a href="{% url 'orders:order_detail' order.pk %}">Pedido #{{ order.id }}</a></h3>
+            <p>Data: {{ order.criado_em|date:"d/m/Y H:i" }}</p>
+            <p>Total: R$ {{ order.valor_total }}</p>
+            <p>Status: <strong>{{ order.get_status_display }}</strong></p>
+        </div>
+        <hr>
+    {% empty %}
+        <p>Você ainda não fez nenhum pedido.</p>
+    {% endfor %}
+</body>
+</html>

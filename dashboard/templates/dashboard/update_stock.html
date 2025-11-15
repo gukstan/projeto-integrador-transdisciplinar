@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Editar Estoque: {{ product.nome }}</title>
+</head>
+<body>
+    <a href="{% url 'dashboard:manage_stock' %}">[Voltar]</a>
+    <h2>Editar Estoque: {{ product.nome }}</h2>
+    
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        <label for="id_quantidade">Nova Quantidade em Estoque:</label>
+        <input type="number" name="quantidade_estoque" value="{{ product.quantidade_estoque }}" id="id_quantidade" min="0">
+        <button type="submit">Salvar Alteração</button>
+    </form>
+</body>
+</html>

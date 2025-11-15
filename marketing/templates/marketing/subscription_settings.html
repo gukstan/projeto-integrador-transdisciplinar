@@ -1,0 +1,8 @@
+<form method="POST">
+    {% csrf_token %}
+    <input type="checkbox" name="receber_promocoes" id="id_receber_promocoes" {% if receber_promocoes %}checked{% endif %}>
+    <label for="id_receber_promocoes">
+        Eu quero receber promoções e descontos especiais por e-mail.
+    </label>
+    <button type="submit">Salvar Preferências</button>
+</form>

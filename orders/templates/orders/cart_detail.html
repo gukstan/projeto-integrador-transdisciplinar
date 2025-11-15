@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Meu Carrinho{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <h2>🛒 Meu Carrinho</h2>
+        <hr>
+
+        {% if cart_items %}
+            <ul class="list-group list-group-flush">
+                {% for item in cart_items %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-1">{{ item.product.nome }}</h5>
+                        <small class="text-muted">
+                            Quantidade: {{ item.quantity }} | Valor Unit.: R$ {{ item.product.valor }}
+                        </small>
+                    </div>
+                    
+                    <span class="badge bg-primary rounded-pill fs-6">
+                        R$ {{ item.total_item }}
+                    </span>
+
+                    <div class="ms-3">
+                        <a href="{% url 'orders:add_to_cart' item.product.id %}" class="btn btn-outline-success btn-sm">+</a>
+                        <a href="{% url 'orders:remove_from_cart' item.product.id %}" class="btn btn-outline-danger btn-sm">-</a>
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                Seu carrinho está vazio.
+            </div>
+        {% endif %}
+
+        <a href="{% url 'store:product_list' %}" class="btn btn-outline-secondary mt-3">[Continuar Comprando]</a>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header">
+                Resumo do Pedido
+            </div>
+            <div class="card-body">
+                <h5 class="card-title d-flex justify-content-between">
+                    <span>Subtotal</span>
+                    <strong>R$ {{ subtotal }}</strong>
+                </h5>
+                <hr>
+                
+                {% if min_order_met %}
+                    <a href="{% url 'orders:checkout' %}" class="btn btn-success btn-lg w-100">
+                        Ir para Pagamento
+                    </a>
+                {% else %}
+                    <div class="alert alert-warning text-center">
+                        Pedido mínimo de R$ 10,00 (RN#1)
+                    </div>
+                    <a href="#" class="btn btn-secondary btn-lg w-100 disabled">
+                        Ir para Pagamento
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

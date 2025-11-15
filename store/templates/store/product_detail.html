@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.nome }}{% endblock %}
+
+{% block content %}
+<div class="row g-5">
+    
+    <div class="col-lg-6">
+        <div class="card">
+            {% if product.imagem %}
+                <img src="{{ product.imagem.url }}" class="card-img-top" alt="{{ product.nome }}" style="max-height: 450px; object-fit: cover;">
+            {% endif %}
+            <div class="card-body">
+                <h1 class="card-title">{{ product.nome }}</h1>
+                <p class="card-text">Sabor: {{ product.sabor }}</p>
+                <p class="card-text">Estoque: {{ product.quantidade_estoque }}</p>
+                
+                <h3 class="text-success mb-3">R$ {{ product.valor }}</h3>
+                
+                <a href="{% url 'orders:add_to_cart' product.id %}" class="btn btn-primary btn-lg">
+                    [+] Adicionar ao Carrinho
+                </a>
+            </div>
+        </div>
+        <a href="{% url 'store:product_list' %}" class="btn btn-link mt-2">[Voltar para Vitrine]</a>
+    </div>
+
+    <div class="col-lg-6">
+        <h2>Avaliações</h2>
+        <p class="lead">Média: {{ average_rating|floatformat:1 }} estrelas</p>
+        <hr>
+
+        <div class="card bg-light mb-4">
+            <div class="card-body">
+                {% if user.is_authenticated %}
+                    <h5>Deixe sua avaliação:</h5>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="id_estrelas" class="form-label">Estrelas:</label>
+                            <select name="estrelas" id="id_estrelas" class="form-select">
+                                <option value="5">5 Estrelas</option>
+                                <option value="4">4 Estrelas</option>
+                                <option value="3">3 Estrelas</option>
+                                <option value="2">2 Estrelas</option>
+                                <option value="1">1 Estrela</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_comentario" class="form-label">Comentário:</label>
+                            <textarea name="comentario" id="id_comentario" class="form-control" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Enviar Avaliação</button>
+                    </form>
+                {% else %}
+                    <p class="mb-0">
+                        <a href="{% url 'users:login' %}?next={{ request.path }}">Faça login</a> para avaliar este produto.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+
+        <h4>O que outros clientes disseram:</h4>
+        <ul class="list-group list-group-flush">
+            {% for review in reviews %}
+                <li class="list-group-item px-0">
+                    <strong>{{ review.usuario.username }}</strong>
+                    <span class="badge bg-primary ms-2">{{ review.estrelas }} estrelas</span>
+                    <p class="mb-1 mt-1">{{ review.comentario|linebreaks }}</p>
+                    <small class="text-muted">{{ review.criado_em|date:"d/m/Y H:i" }}</small>
+                </li>
+            {% empty %}
+                <li class="list-group-item px-0">
+                    <p class="text-muted">Este produto ainda não tem avaliações.</p>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}

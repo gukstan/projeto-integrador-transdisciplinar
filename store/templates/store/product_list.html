@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}Vitrine de Cupcakes{% endblock %}
+
+{% block content %}
+
+    <h1 class="mb-4">🧁 Vitrine de Cupcakes</h1>
+
+    <form method="GET" action="{% url 'store:product_list' %}" class="row g-3 mb-4">
+        <div class="col-md-6">
+            <input type="text" name="q" class="form-control" placeholder="Buscar por sabor..." value="{{ request.GET.q }}">
+        </div>
+        <div class="col-md-4">
+            <select name="categoria" class="form-select">
+                <option value="">Todas as categorias</option>
+                {% for cat in categories %}
+                    <option value="{{ cat.id }}" {% if cat.id|stringformat:"s" == selected_category_id %}selected{% endif %}>
+                        {{ cat.get_nome_display }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Filtrar/Buscar</button>
+        </div>
+    </form>
+
+    <div class="row">
+        {% for product in products %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if product.imagem %}
+                        <img src="{{ product.imagem.url }}" class="card-img-top" alt="{{ product.nome }}" style="height: 250px; object-fit: cover;">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">
+                            <a href="{% url 'store:product_detail' product.id %}" class="text-decoration-none">{{ product.nome }}</a>
+                        </h5>
+                        <p class="card-text">Sabor: {{ product.sabor }}</p>
+                        <h6 class="card-subtitle mb-2 text-success">R$ {{ product.valor }}</h6>
+                    </div>
+                    <div class="card-footer bg-white">
+                        <a href="{% url 'orders:add_to_cart' product.id %}" class="btn btn-primary btn-sm">
+                            [+] Adicionar ao Carrinho
+                        </a>
+                        <a href="{% url 'store:toggle_favorite' product.id %}" class="btn btn-outline-danger btn-sm">
+                            ❤️
+                        </a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col">
+                <div class="alert alert-warning" role="alert">
+                    Nenhum cupcake encontrado. (Verifique o estoque no /admin/).
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

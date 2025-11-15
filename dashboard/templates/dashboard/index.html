@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Dashboard</title>
+</head>
+<body>
+    <h1>Painel do Administrador</h1>
+    <a href="{% url 'store:product_list' %}">[Voltar para Loja]</a>
+    <hr>
+    <ul>
+        <li><a href="{% url 'dashboard:manage_stock' %}">Gerenciar Estoque
+            
+        </a></li>
+        <li><a href="{% url 'dashboard:sales_report' %}">Relatório de Vendas
+        </a></li>
+    </ul>
+    <hr>
+    <h3>Resumo Rápido</h3>
+    <p>Total de pedidos hoje: {{ total_pedidos_hoje }}</p>
+</body>
+</html>

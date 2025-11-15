@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Finalizar Pedido{% endblock %}
+
+{% block content %}
+<div class="row g-5">
+    <div class="col-md-7 col-lg-8">
+        <h2>Finalizar Pedido</h2>
+        <hr class="my-4">
+
+        <h4 class="mb-3">Entrega</h4>
+        <form class="row g-3" id="shipping-form" onsubmit="calculateShipping(event)">
+            <div class="col-sm-9">
+                <label for="id_cep" class="form-label">Calcular Frete (CEP)</label>
+                <input type="text" name="cep" class="form-control" id="id_cep" placeholder="00000-000">
+            </div>
+            <div class="col-sm-3 align-self-end">
+                <button type="submit" class="btn btn-secondary w-100">Calcular</button>
+            </div>
+        </form>
+        
+        <div id="shipping-result" class="mt-3"></div>
+        <hr class="my-4">
+
+        <h4 class="mb-3">Forma de Pagamento</h4>
+        <div class="card bg-light p-3">
+            <p class="mb-0"><strong>[Simulação de Gateway de Pagamento PIX]</strong></p>
+            <p><small class="text-muted">Ao clicar abaixo, você confirma o pedido e o pagamento será (simulado) aprovado.</small></p>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <button type
+="submit" class="btn btn-success btn-lg w-100">
+                    Confirmar Pedido e Pagar com PIX
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div class="col-md-5 col-lg-4 order-md-last">
+        <div class="card sticky-top" style="top: 2rem;">
+            <div class="card-header">
+                <h4 class="d-flex justify-content-between align-items-center mb-0">
+                    <span>Resumo</span>
+                    <span class="badge bg-primary rounded-pill">{{ cart.items.count }}</span>
+                </h4>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item d-flex justify-content-between lh-sm">
+                    <div>
+                        <h6 class="my-0">Subtotal</h6>
+                    </div>
+                    <span class="text-muted">R$ {{ subtotal }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between lh-sm">
+                    <div>
+                        <h6 class="my-0">Frete</h6>
+                        <small class="text-muted">(Regra frete grátis acima de R$ 100,00)</small>
+                    </div>
+                    <span class="text-muted" id="shipping-cost">R$ {{ frete }}</span>
+                </li>
+                <li class="list-group-item d-flex justify-content-between bg-light">
+                    <strong>Total (BRL)</strong>
+                    <strong id="total-cost">R$ {{ valor_total }}</strong>
+                </li>
+            </ul>
+        </div>
+        <a href="{% url 'orders:cart_detail' %}" class="btn btn-link mt-2">[Voltar ao Carrinho]</a>
+    </div>
+</div>
+
+<script>
+    function calculateShipping(event) {
+        event.preventDefault(); // Impede o envio do formulário
+        
+        const cep = document.getElementById('id_cep').value;
+        const resultDiv = document.getElementById('shipping-result');
+        const shippingCostEl = document.getElementById('shipping-cost');
+        const totalCostEl = document.getElementById('total-cost');
+        const subtotal = {{ subtotal }}; // Pega o subtotal do Django
+
+        fetch(`/pedidos/carrinho/calcular-frete/?cep=${cep}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    resultDiv.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                } else {
+                    // US-13 (RN#1): Frete grátis
+                    let freteFinal = data.valor;
+                    if (subtotal >= 100) {
+                        freteFinal = 0;
+                        resultDiv.innerHTML = `<div class="alert alert-success">Prazo: ${data.prazo}. <strong>Frete Grátis aplicado!</strong></div>`;
+                    } else {
+                        resultDiv.innerHTML = `<div class="alert alert-info">Valor: R$ ${data.valor} | Prazo: ${data.prazo}</div>`;
+                    }
+
+                    // Atualiza o Resumo (simples, sem salvar no backend ainda)
+                    let total = subtotal + parseFloat(freteFinal);
+                    shippingCostEl.innerText = `R$ ${parseFloat(freteFinal).toFixed(2)}`;
+                    totalCostEl.innerText = `R$ ${total.toFixed(2)}`;
+                }
+            })
+            .catch(error => {
+                resultDiv.innerHTML = `<div class="alert alert-danger">Erro ao conectar com a API.</div>`;
+            });
+    }
+</script>
+{% endblock %}
